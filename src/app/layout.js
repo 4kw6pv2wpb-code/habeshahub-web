@@ -5,9 +5,29 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata = {
-  title: 'HabeshaHub — Diaspora Super App',
+  title: 'HabeshaHub — The Diaspora Super App',
   description:
-    'The all-in-one platform for Ethiopian, Eritrean, and Somali diaspora communities. Connect, find jobs, housing, events, and more.',
+    'The all-in-one platform for Ethiopian, Eritrean, and Somali diaspora communities. Jobs, housing, events, marketplace, dating, immigration resources, remittance, and more — all in one place.',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/apple-icon.svg',
+  },
+  metadataBase: new URL('https://habeshahub-web-production.up.railway.app'),
+  openGraph: {
+    title: 'HabeshaHub — The Diaspora Super App',
+    description:
+      'Connect with the Ethiopian, Eritrean, and Somali diaspora. Jobs, housing, events, marketplace, dating, immigration help, and more.',
+    siteName: 'HabeshaHub',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'HabeshaHub — The Diaspora Super App',
+    description:
+      'Connect with the Ethiopian, Eritrean, and Somali diaspora. Jobs, housing, events, marketplace, dating, immigration help, and more.',
+  },
 };
 
 export default function RootLayout({ children }) {
