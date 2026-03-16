@@ -1,100 +1,133 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { PostCard } from '@/components/feed/PostCard';
 import { Badge } from '@/components/ui/Badge';
-import { FiMapPin, FiCalendar, FiEdit2, FiBriefcase, FiGlobe } from 'react-icons/fi';
+import { FiMapPin, FiCalendar, FiEdit2, FiBriefcase, FiGlobe, FiLoader } from 'react-icons/fi';
+import { useAuth } from '@/lib/auth-context';
+import { communityApi, feedApi } from '@/lib/api';
 
 const TABS = ['Posts', 'About', 'Photos', 'Connections'];
 
-const MOCK_PROFILE = {
-  name: 'Eyob T.', bio: 'First-gen Eritrean-American 🇪🇷 | Seattle | Tech & Community Builder', location: 'Seattle, WA', heritage: 'Eritrean',
-  joined: 'January 2024', work: 'Software Engineer at HabeshaHub', education: 'University of Washington', languages: ['English', 'Tigrinya', 'Amharic'],
-  followers: 234, following: 189, posts: 47,
-};
-
-const MOCK_POSTS = [
-  { id: 1, author: 'Eyob T.', time: '3h ago', location: 'Seattle, WA', content: 'Just shipped a new feature on HabeshaHub — the translation tool now supports Tigrinya! 🎉 Building for our community is the most rewarding work. Try it out and let me know what you think.', likes: 56, comments: 14, shares: 8 },
-  { id: 2, author: 'Eyob T.', time: '2d ago', location: 'Seattle, WA', content: 'Beautiful day at Alki Beach. Reminded me of the Red Sea coast stories my parents used to tell. Seattle sunsets hit different when you carry two homes in your heart. 🌅', likes: 89, comments: 22, shares: 5, image: true, imageAlt: '🌅 Sunset photo', imageBg: 'bg-gradient-to-br from-orange-200/50 to-accent/20' },
-];
-
 export default function ProfilePage() {
+  const { user } = useAuth();
   const [tab, setTab] = useState('Posts');
+  const [profile, setProfile] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      setLoading(true);
+      try {
+        const [profileRes, postsRes] = await Promise.allSettled([
+          communityApi.getMyProfile(),
+          feedApi.getPosts({ userId: 'me', limit: 10 }),
+        ]);
+        if (profileRes.status === 'fulfilled') {
+          setProfile(profileRes.value.data?.data || profileRes.value.data || null);
+        }
+        if (postsRes.status === 'fulfilled') {
+          setPosts(postsRes.value.data?.data || postsRes.value.data || []);
+        }
+      } catch (err) {
+        console.error('Profile fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProfile();
+  }, []);
+
+  const displayProfile = profile || user || {};
 
   return (
     <AppLayout>
       <div className="mx-auto max-w-4xl">
-        {/* Cover */}
         <div className="h-48 bg-gradient-to-r from-primary/30 via-eritrean-blue/20 to-habesha-green/30 sm:h-56" />
-
-        {/* Profile Info */}
         <div className="relative px-4">
           <div className="-mt-16 flex flex-col items-center sm:flex-row sm:items-end sm:gap-4">
-            <div className="rounded-full border-4 border-white bg-white dark:border-dark-900">
-              <Avatar name={MOCK_PROFILE.name} size="xl" className="!h-32 !w-32 !text-3xl" />
+            <Avatar name={displayProfile.name || 'User'} size="xl" className="ring-4 ring-white" />
+            <div className="mt-3 text-center sm:text-left sm:mt-0 sm:mb-2">
+              <h1 className="text-2xl font-bold text-gray-900">{displayProfile.name || 'Your Name'}</h1>
+              <p className="text-sm text-gray-500">{displayProfile.bio || ''}</p>
             </div>
-            <div className="mt-2 flex-1 text-center sm:mb-2 sm:text-left">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{MOCK_PROFILE.name}</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{MOCK_PROFILE.bio}</p>
-              <div className="mt-1 flex flex-wrap items-center justify-center gap-3 text-xs text-gray-500 dark:text-gray-400 sm:justify-start">
-                <span className="flex items-center gap-1"><FiMapPin size={12} /> {MOCK_PROFILE.location}</span>
-                <span className="flex items-center gap-1"><FiCalendar size={12} /> Joined {MOCK_PROFILE.joined}</span>
-                <Badge variant="blue">{MOCK_PROFILE.heritage}</Badge>
-              </div>
+            <div className="mt-3 sm:mt-0 sm:ml-auto sm:mb-2">
+              <Button className="flex items-center gap-2"><FiEdit2 /> Edit Profile</Button>
             </div>
-            <Button variant="secondary" size="md" className="mt-3 sm:mt-0 sm:mb-2"><FiEdit2 size={14} className="mr-1" /> Edit Profile</Button>
           </div>
 
-          {/* Stats */}
-          <div className="mt-4 flex justify-center gap-6 border-b border-gray-200 pb-4 dark:border-dark-700 sm:justify-start">
-            <div className="text-center"><span className="block text-lg font-bold text-gray-900 dark:text-white">{MOCK_PROFILE.posts}</span><span className="text-xs text-gray-500">Posts</span></div>
-            <div className="text-center"><span className="block text-lg font-bold text-gray-900 dark:text-white">{MOCK_PROFILE.followers}</span><span className="text-xs text-gray-500">Followers</span></div>
-            <div className="text-center"><span className="block text-lg font-bold text-gray-900 dark:text-white">{MOCK_PROFILE.following}</span><span className="text-xs text-gray-500">Following</span></div>
+          <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-500">
+            {displayProfile.location && (
+              <span className="flex items-center gap-1"><FiMapPin />{displayProfile.location}</span>
+            )}
+            {displayProfile.work && (
+              <span className="flex items-center gap-1"><FiBriefcase />{displayProfile.work}</span>
+            )}
           </div>
 
-          {/* Tabs */}
-          <div className="mt-2 flex gap-1 overflow-x-auto">
-            {TABS.map(t => <button key={t} onClick={() => setTab(t)} className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${tab === t ? 'bg-primary/10 text-primary' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-dark-800'}`}>{t}</button>)}
+          <div className="mt-4 flex gap-6 text-sm">
+            <span><strong>{displayProfile.followers || 0}</strong> Followers</span>
+            <span><strong>{displayProfile.following || 0}</strong> Following</span>
+            <span><strong>{displayProfile.posts || posts.length}</strong> Posts</span>
           </div>
         </div>
 
-        {/* Tab Content */}
-        <div className="px-4 py-4">
-          {tab === 'Posts' && (
-            <div className="mx-auto max-w-2xl space-y-4">
-              {MOCK_POSTS.map(p => <PostCard key={p.id} post={p} />)}
+        <div className="mt-6 border-b border-gray-200">
+          <div className="flex gap-1 px-4">
+            {TABS.map((t) => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
+                  tab === t ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-4 py-6">
+          {loading && (
+            <div className="flex justify-center py-12">
+              <FiLoader className="w-8 h-8 animate-spin text-primary" />
             </div>
           )}
-          {tab === 'About' && (
-            <div className="mx-auto max-w-2xl rounded-xl border border-gray-200 bg-white p-6 dark:border-dark-700 dark:bg-dark-800">
-              <h3 className="mb-4 font-semibold text-gray-900 dark:text-white">About</h3>
-              <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                <p className="flex items-center gap-2"><FiBriefcase size={16} className="text-gray-400" /> {MOCK_PROFILE.work}</p>
-                <p className="flex items-center gap-2"><FiCalendar size={16} className="text-gray-400" /> {MOCK_PROFILE.education}</p>
-                <p className="flex items-center gap-2"><FiMapPin size={16} className="text-gray-400" /> {MOCK_PROFILE.location}</p>
-                <p className="flex items-center gap-2"><FiGlobe size={16} className="text-gray-400" /> {MOCK_PROFILE.languages.join(', ')}</p>
+
+          {tab === 'Posts' && !loading && (
+            posts.length > 0 ? (
+              <div className="space-y-4">
+                {posts.map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
               </div>
-            </div>
+            ) : (
+              <div className="text-center text-gray-500 py-8">
+                <p className="text-lg font-medium">No posts yet</p>
+                <p className="mt-1">Share your first post with the community!</p>
+              </div>
+            )
           )}
-          {tab === 'Photos' && (
-            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-              {Array.from({ length: 8 }, (_, i) => (
-                <div key={i} className={`aspect-square rounded-xl bg-gradient-to-br ${['from-primary/20 to-habesha-green/20', 'from-accent/20 to-primary/20', 'from-eritrean-blue/20 to-primary/20', 'from-habesha-red/20 to-habesha-yellow/20'][i % 4]}`} />
-              ))}
-            </div>
-          )}
-          {tab === 'Connections' && (
-            <div className="mx-auto max-w-2xl grid gap-3 sm:grid-cols-2">
-              {['Selam Tekle', 'Dawit Mekonnen', 'Hiwet G.', 'Kidist Abebe', 'Yonas Haile', 'Meron Berhe'].map(name => (
-                <div key={name} className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 dark:border-dark-700 dark:bg-dark-800">
-                  <Avatar name={name} size="md" />
-                  <div className="flex-1"><p className="text-sm font-semibold text-gray-900 dark:text-white">{name}</p></div>
-                  <Button variant="ghost" size="sm">Following</Button>
+
+          {tab === 'About' && !loading && (
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+              <h3 className="font-semibold text-gray-900">About</h3>
+              <p className="text-gray-600">{displayProfile.bio || 'No bio yet'}</p>
+              {displayProfile.education && (
+                <div><span className="text-sm text-gray-500">Education:</span> <span className="text-gray-700">{displayProfile.education}</span></div>
+              )}
+              {displayProfile.languages && (
+                <div className="flex flex-wrap gap-2">
+                  {(Array.isArray(displayProfile.languages) ? displayProfile.languages : []).map(l => (
+                    <Badge key={l}>{l}</Badge>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>
