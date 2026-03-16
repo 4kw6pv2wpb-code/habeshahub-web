@@ -45,7 +45,19 @@ export default function HousingPage() {
         const raw = res.data?.data ?? res.data?.listings ?? res.data;
         const data = Array.isArray(raw) ? raw : [];
         if (data.length > 0) {
-          setListings(data);
+          // Normalize API data to match the shape the UI expects
+          const normalized = data.map((item) => ({
+            id: item.id,
+            title: item.title || '',
+            price: typeof item.rent === 'number' ? `$${item.rent.toLocaleString()}/mo` : item.price || '',
+            beds: item.bedrooms ?? item.beds ?? 0,
+            type: item.listingType || item.type || '',
+            city: item.city || item.location || '',
+            poster: typeof item.poster === 'object' ? item.poster?.name : item.poster || 'Community member',
+            posted: item.posted || '',
+            desc: item.description || item.desc || '',
+          }));
+          setListings(normalized);
         }
       } catch (err) {
         console.error('Failed to fetch housing, using mock data:', err);

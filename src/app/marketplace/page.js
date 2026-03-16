@@ -52,7 +52,17 @@ export default function MarketplacePage() {
         const raw = res.data?.data ?? res.data?.items ?? res.data;
         const data = Array.isArray(raw) ? raw : [];
         if (data.length > 0) {
-          setItems(data);
+          // Normalize API data to match the shape the UI expects
+          const normalized = data.map((item) => ({
+            id: item.id,
+            title: item.title || '',
+            price: typeof item.price === 'number' ? `$${item.price.toLocaleString()}` : item.price || '',
+            category: item.category || '',
+            seller: typeof item.seller === 'object' ? item.seller?.name : item.seller || '',
+            location: item.location || '',
+            img: item.img || item.imageUrl || item.image || '📦',
+          }));
+          setItems(normalized);
         }
       } catch (err) {
         console.error('Failed to fetch marketplace, using mock data:', err);
@@ -149,8 +159,12 @@ export default function MarketplacePage() {
                 href={`/marketplace/${item.id}`}
                 className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-colors group"
               >
-                <div className="aspect-square bg-gray-800 flex items-center justify-center text-4xl">
-                  {item.img || item.image || '\ud83d\udcce'}
+                <div className="aspect-square bg-gray-800 flex items-center justify-center text-4xl overflow-hidden">
+                  {item.img && item.img.startsWith('http') ? (
+                    <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
+                  ) : (
+                    item.img || '📦'
+                  )}
                 </div>
                 <div className="p-3">
                   <div className="text-amber-400 font-bold mb-1">{typeof item.price === 'number' ? `$${item.price}` : item.price}</div>
