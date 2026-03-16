@@ -17,7 +17,7 @@ const DEMO_PRODUCTS = [
     currency: 'USD',
     category: 'Fashion',
     imageUrl: 'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=400',
-    seller: { name: 'Tigist Designs', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tigist' },
+    seller: { name: 'Tigist Designs', rating: 4.9 },
     location: 'Washington, DC',
     condition: 'New',
     createdAt: '2026-03-14T10:00:00Z',
@@ -30,7 +30,7 @@ const DEMO_PRODUCTS = [
     currency: 'USD',
     category: 'Food',
     imageUrl: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400',
-    seller: { name: 'Habesha Foods Market', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=foods' },
+    seller: { name: 'Habesha Foods Market', rating: 4.8 },
     location: 'Seattle, WA',
     condition: 'New',
     createdAt: '2026-03-13T15:00:00Z',
@@ -43,7 +43,7 @@ const DEMO_PRODUCTS = [
     currency: 'USD',
     category: 'Other',
     imageUrl: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=400',
-    seller: { name: 'Abeba Crafts', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=abeba' },
+    seller: { name: 'Abeba Crafts', rating: 5.0 },
     location: 'Atlanta, GA',
     condition: 'New',
     createdAt: '2026-03-12T09:00:00Z',
@@ -55,8 +55,8 @@ const DEMO_PRODUCTS = [
     price: 180,
     currency: 'USD',
     category: 'Fashion',
-    imageUrl: 'https://images.unsplash.com/photo-1515562141589-67f0d569b986?w=400',
-    seller: { name: 'Semhar Gold', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=semhar' },
+    imageUrl: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=400',
+    seller: { name: 'Semhar Gold', rating: 4.7 },
     location: 'Dallas, TX',
     condition: 'New',
     createdAt: '2026-03-11T12:00:00Z',
@@ -69,7 +69,7 @@ const DEMO_PRODUCTS = [
     currency: 'USD',
     category: 'Food',
     imageUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400',
-    seller: { name: 'Mama Zewdi Kitchen', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=zewdi' },
+    seller: { name: 'Mama Zewdi Kitchen', rating: 5.0 },
     location: 'Minneapolis, MN',
     condition: 'New',
     createdAt: '2026-03-10T08:00:00Z',
@@ -82,10 +82,49 @@ const DEMO_PRODUCTS = [
     currency: 'USD',
     category: 'Electronics',
     imageUrl: 'https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=400',
-    seller: { name: 'Dawit Tech', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=dawit2' },
+    seller: { name: 'Dawit Tech', rating: 4.6 },
     location: 'San Jose, CA',
     condition: 'Used - Like New',
     createdAt: '2026-03-09T14:00:00Z',
+  },
+  {
+    id: 'demo-7',
+    title: 'Mesob Basket — Large Woven',
+    description: 'Traditional Ethiopian/Eritrean mesob serving basket. Hand-woven with colorful patterns. Great for serving injera.',
+    price: 120,
+    currency: 'USD',
+    category: 'Other',
+    imageUrl: 'https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?w=400',
+    seller: { name: 'Habesha Artisans', rating: 4.9 },
+    location: 'Silver Spring, MD',
+    condition: 'New',
+    createdAt: '2026-03-08T11:00:00Z',
+  },
+  {
+    id: 'demo-8',
+    title: 'Car Detailing Service',
+    description: 'Professional mobile car detailing. Interior and exterior. Habesha-owned business serving the Seattle area.',
+    price: 75,
+    currency: 'USD',
+    category: 'Services',
+    imageUrl: 'https://images.unsplash.com/photo-1520340356584-f9166066d1c6?w=400',
+    seller: { name: 'Yonas Auto Detail', rating: 4.8 },
+    location: 'Seattle, WA',
+    condition: 'New',
+    createdAt: '2026-03-07T16:00:00Z',
+  },
+  {
+    id: 'demo-9',
+    title: '2018 Toyota Camry SE',
+    description: 'Reliable sedan, 65K miles, clean title. Single owner, regular maintenance. Great condition.',
+    price: 18500,
+    currency: 'USD',
+    category: 'Vehicles',
+    imageUrl: 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=400',
+    seller: { name: 'Solomon Motors', rating: 4.5 },
+    location: 'Renton, WA',
+    condition: 'Used',
+    createdAt: '2026-03-06T10:00:00Z',
   },
 ];
 
@@ -94,12 +133,10 @@ export default function MarketplacePage() {
   const [search, setSearch] = useState('');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchProducts() {
       setLoading(true);
-      setError(null);
       try {
         const params = {};
         if (category !== 'All') params.category = category;
@@ -108,9 +145,7 @@ export default function MarketplacePage() {
         const data = res.data?.data || res.data || [];
         setProducts(data.length > 0 ? data : DEMO_PRODUCTS);
       } catch (err) {
-        // Marketplace API may not be available yet — use demo data
         setProducts(DEMO_PRODUCTS);
-        console.error('Marketplace fetch:', err);
       } finally {
         setLoading(false);
       }
@@ -127,7 +162,6 @@ export default function MarketplacePage() {
   return (
     <AppLayout>
       <div className="mx-auto max-w-5xl px-4 py-6">
-        {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Marketplace</h1>
           <button className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark">
@@ -136,7 +170,6 @@ export default function MarketplacePage() {
           </button>
         </div>
 
-        {/* Search */}
         <div className="relative mb-4">
           <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input
@@ -148,7 +181,6 @@ export default function MarketplacePage() {
           />
         </div>
 
-        {/* Categories */}
         <div className="mb-6 flex flex-wrap gap-2">
           {CATEGORIES.map((cat) => (
             <button
@@ -165,7 +197,6 @@ export default function MarketplacePage() {
           ))}
         </div>
 
-        {/* Products Grid */}
         {loading ? (
           <div className="flex justify-center py-12">
             <FiLoader className="animate-spin text-primary" size={24} />
