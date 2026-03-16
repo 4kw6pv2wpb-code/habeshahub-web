@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FiUser, FiMail, FiLock, FiMapPin, FiArrowRight } from 'react-icons/fi';
+import { setToken, setRefreshToken } from '@/lib/api';
 import { useAnalytics } from '@/lib/useAnalytics';
 
 const LANGUAGES = ['English', 'Amharic', 'Tigrinya', 'Somali', 'Oromo'];
@@ -42,7 +43,14 @@ export default function RegisterPage() {
       if (data.error) {
         setError(data.error);
       } else {
+        // Store token and user in localStorage
+        if (data.token) setToken(data.token);
+        if (data.refreshToken) setRefreshToken(data.refreshToken);
+        if (data.user) {
+          localStorage.setItem('habeshahub_user', JSON.stringify(data.user));
+        }
         router.push('/home');
+        router.refresh();
       }
     } catch {
       setError('Something went wrong. Please try again.');

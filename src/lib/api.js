@@ -374,6 +374,28 @@ export const datingApi = {
 };
 
 // ---------------------------------------------------------------------------
+// Marketplace API — /marketplace
+// ---------------------------------------------------------------------------
+
+export const marketplaceApi = {
+  getItems(params) {
+    return api.get('/marketplace', { params });
+  },
+  getItem(id) {
+    return api.get(`/marketplace/${id}`);
+  },
+  createItem(data) {
+    return api.post('/marketplace', data);
+  },
+  updateItem(id, data) {
+    return api.put(`/marketplace/${id}`, data);
+  },
+  deleteItem(id) {
+    return api.delete(`/marketplace/${id}`);
+  },
+};
+
+// ---------------------------------------------------------------------------
 // AI API — /ai
 // ---------------------------------------------------------------------------
 

@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FiSearch, FiMapPin, FiHome, FiPlus, FiUser } from 'react-icons/fi';
+import { FiSearch, FiMapPin, FiHome, FiPlus, FiUser, FiLoader } from 'react-icons/fi';
 import AppLayout from '@/components/layout/AppLayout';
+import { housingApi } from '@/lib/api';
 import { useAnalytics } from '@/lib/useAnalytics';
 
 const CITIES = ['All Cities', 'Seattle, WA', 'Washington, DC', 'Los Angeles, CA', 'Atlanta, GA', 'Minneapolis, MN', 'Columbus, OH'];
 const TYPES = ['All Types', 'Apartment', 'Room', 'House', 'Sublet'];
 
-const LISTINGS = [
+const MOCK_LISTINGS = [
   { id: '1', title: '2BR Apartment in Rainier Beach', price: '$1,450/mo', beds: 2, type: 'Apartment', city: 'Seattle, WA', poster: 'Meron T.', posted: '2 days ago', desc: 'Spacious 2BR near Ethiopian restaurants. Laundry in building. Bus line nearby.' },
   { id: '2', title: 'Room in Columbia Heights townhouse', price: '$850/mo', beds: 1, type: 'Room', city: 'Washington, DC', poster: 'Kidist M.', posted: '1 day ago', desc: 'Furnished room in Habesha household. Shared kitchen. Female preferred.' },
   { id: '3', title: '1BR near Little Ethiopia', price: '$1,800/mo', beds: 1, type: 'Apartment', city: 'Los Angeles, CA', poster: 'Liya F.', posted: '3 days ago', desc: 'Walking distance to Fairfax District. Modern building with gym.' },
@@ -33,13 +34,38 @@ export default function HousingPage() {
   const [city, setCity] = useState('All Cities');
   const [type, setType] = useState('All Types');
   const [priceMax, setPriceMax] = useState('');
+  const [listings, setListings] = useState(MOCK_LISTINGS);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = LISTINGS.filter((l) => {
+  useEffect(() => {
+    async function fetchListings() {
+      setLoading(true);
+      try {
+        const params = {};
+        if (city !== 'All Cities') params.city = city;
+        if (type !== 'All Types') params.type = type;
+        if (search) params.search = search;
+        const res = await housingApi.getListings(params);
+        const data = res.data?.data || res.data || [];
+        if (data.length > 0) {
+          setListings(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch housing, using mock data:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchListings();
+  }, []);
+
+  const filtered = listings.filter((l) => {
     if (city !== 'All Cities' && l.city !== city) return false;
     if (type !== 'All Types' && l.type !== type) return false;
-    if (search && !l.title.toLowerCase().includes(search.toLowerCase()) && !l.desc.toLowerCase().includes(search.toLowerCase())) return false;
+    if (search && !l.title.toLowerCase().includes(search.toLowerCase()) && !(l.desc || l.description || '').toLowerCase().includes(search.toLowerCase())) return false;
     if (priceMax) {
-      const price = parseInt(l.price.replace(/[$,/mo]/g, ''));
+      const priceStr = typeof l.price === 'number' ? String(l.price) : l.price;
+      const price = parseInt(priceStr.replace(/[$,/mo]/g, ''));
       if (price > parseInt(priceMax)) return false;
     }
     return true;
@@ -51,7 +77,7 @@ export default function HousingPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">Housing</h1>
-            <p className="text-gray-400 text-sm">{LISTINGS.length} listings from the community</p>
+            <p className="text-gray-400 text-sm">{listings.length} listings from the community</p>
           </div>
           <button className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl text-sm flex items-center gap-2">
             <FiPlus size={16} /> Post Listing
@@ -94,36 +120,44 @@ export default function HousingPage() {
           />
         </div>
 
+        {loading && (
+          <div className="flex justify-center py-12">
+            <FiLoader className="w-8 h-8 animate-spin text-amber-500" />
+          </div>
+        )}
+
         {/* Listings */}
-        <div className="space-y-3">
-          {filtered.map((listing) => (
-            <Link
-              key={listing.id}
-              href={`/housing/${listing.id}`}
-              className="block bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors group"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <h3 className="font-semibold text-white group-hover:text-amber-400 transition-colors">{listing.title}</h3>
-                  <div className="flex items-center gap-3 text-sm text-gray-400 mt-1">
-                    <span className="flex items-center gap-1"><FiMapPin size={12} /> {listing.city}</span>
-                    <span className="flex items-center gap-1"><FiHome size={12} /> {listing.beds === 0 ? 'Studio' : `${listing.beds}BR`}</span>
-                    <span className="px-2 py-0.5 bg-gray-800 rounded text-xs">{listing.type}</span>
+        {!loading && (
+          <div className="space-y-3">
+            {filtered.map((listing) => (
+              <Link
+                key={listing.id}
+                href={`/housing/${listing.id}`}
+                className="block bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors group"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 className="font-semibold text-white group-hover:text-amber-400 transition-colors">{listing.title}</h3>
+                    <div className="flex items-center gap-3 text-sm text-gray-400 mt-1">
+                      <span className="flex items-center gap-1"><FiMapPin size={12} /> {listing.city || listing.location}</span>
+                      <span className="flex items-center gap-1"><FiHome size={12} /> {listing.beds === 0 ? 'Studio' : `${listing.beds}BR`}</span>
+                      <span className="px-2 py-0.5 bg-gray-800 rounded text-xs">{listing.type}</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-amber-400">{typeof listing.price === 'number' ? `$${listing.price}/mo` : listing.price}</div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold text-amber-400">{listing.price}</div>
+                <p className="text-sm text-gray-500 line-clamp-1 mb-2">{listing.desc || listing.description}</p>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <FiUser size={10} /> Posted by {listing.poster || listing.user?.name || 'Community member'} {listing.posted ? `• ${listing.posted}` : ''}
                 </div>
-              </div>
-              <p className="text-sm text-gray-500 line-clamp-1 mb-2">{listing.desc}</p>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <FiUser size={10} /> Posted by {listing.poster} • {listing.posted}
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <div className="text-center py-12 text-gray-500">No listings match your filters</div>
         )}
       </div>
