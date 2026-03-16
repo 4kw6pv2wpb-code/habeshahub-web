@@ -1,0 +1,20 @@
+{
+  "name": "HabeshaHub - The Diaspora Super App",
+  "short_name": "HabeshaHub",
+  "description": "Connecting Ethiopian, Eritrean & Somali communities worldwide",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#d97706",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "lifestyle", "business"]
+}
