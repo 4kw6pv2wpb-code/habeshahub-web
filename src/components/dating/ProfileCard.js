@@ -22,7 +22,7 @@ export function ProfileCard({ profile }) {
   }[goal] || '';
 
   return (
-    <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg dark:border-dark-700 dark:bg-dark-800">
+    <div className="relative mx-auto w-full max-w-lg overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg dark:border-dark-700 dark:bg-dark-800">
       {/* Photo area */}
       <div className="relative h-96">
         {photoUrl ? (

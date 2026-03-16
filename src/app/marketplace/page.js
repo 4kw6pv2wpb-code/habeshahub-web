@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FiSearch, FiMapPin, FiGrid, FiPlus, FiLoader } from 'react-icons/fi';
+import { FiSearch, FiMapPin, FiGrid, FiPlus, FiShoppingBag, FiMessageCircle } from 'react-icons/fi';
 import AppLayout from '@/components/layout/AppLayout';
 import { marketplaceApi } from '@/lib/api';
 import { useAnalytics } from '@/lib/useAnalytics';
@@ -36,6 +36,23 @@ const MOCK_ITEMS = [
   { id: '24', title: 'Photography: Habesha Weddings', price: '$3,000', category: 'Services', seller: 'Henok G.', location: 'Washington, DC', img: '\ud83d\udcf8' },
 ];
 
+function MarketplaceSkeleton() {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+        <div key={i} className="rounded-xl bg-gray-900 border border-gray-800 overflow-hidden">
+          <div className="skeleton aspect-square !bg-gray-800 rounded-none" />
+          <div className="p-3 space-y-2">
+            <div className="skeleton h-4 w-16 !bg-gray-700" />
+            <div className="skeleton h-3 w-full !bg-gray-700" />
+            <div className="skeleton h-3 w-2/3 !bg-gray-700" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function MarketplacePage() {
   useAnalytics();
   const [search, setSearch] = useState('');
@@ -60,7 +77,7 @@ export default function MarketplacePage() {
             category: item.category || '',
             seller: typeof item.seller === 'object' ? item.seller?.name : item.seller || '',
             location: item.location || '',
-            img: item.img || item.imageUrl || item.image || '📦',
+            img: item.img || item.imageUrl || item.image || '\ud83d\udce6',
           }));
           setItems(normalized);
         }
@@ -90,13 +107,13 @@ export default function MarketplacePage() {
 
   return (
     <AppLayout>
-      <div className="max-w-5xl mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-4 py-6 page-fade-in">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">Marketplace</h1>
             <p className="text-gray-400 text-sm">{items.length} items from the community</p>
           </div>
-          <button className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl text-sm flex items-center gap-2">
+          <button className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl text-sm flex items-center gap-2 transition-colors shadow-lg shadow-amber-500/20">
             <FiPlus size={16} /> List Item
           </button>
         </div>
@@ -108,7 +125,7 @@ export default function MarketplacePage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search marketplace..."
-            className="w-full pl-11 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"
+            className="w-full pl-11 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 transition-colors"
           />
         </div>
 
@@ -144,11 +161,7 @@ export default function MarketplacePage() {
           ))}
         </div>
 
-        {loading && (
-          <div className="flex justify-center py-12">
-            <FiLoader className="w-8 h-8 animate-spin text-amber-500" />
-          </div>
-        )}
+        {loading && <MarketplaceSkeleton />}
 
         {/* Items grid */}
         {!loading && (
@@ -157,14 +170,22 @@ export default function MarketplacePage() {
               <Link
                 key={item.id}
                 href={`/marketplace/${item.id}`}
-                className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-colors group"
+                className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden card-hover hover:border-gray-700 transition-all group"
               >
-                <div className="aspect-square bg-gray-800 flex items-center justify-center text-4xl overflow-hidden">
+                <div className="relative aspect-square bg-gray-800 flex items-center justify-center text-4xl overflow-hidden">
                   {item.img && item.img.startsWith('http') ? (
                     <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
                   ) : (
-                    item.img || '📦'
+                    item.img || '\ud83d\udce6'
                   )}
+                  {/* Dark gradient overlay for readability */}
+                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
+                  {/* Contact Seller overlay on hover */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="flex items-center gap-1.5 rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-black shadow-lg">
+                      <FiMessageCircle size={14} /> Contact Seller
+                    </span>
+                  </div>
                 </div>
                 <div className="p-3">
                   <div className="text-amber-400 font-bold mb-1">{typeof item.price === 'number' ? `$${item.price}` : item.price}</div>
@@ -180,7 +201,13 @@ export default function MarketplacePage() {
         )}
 
         {!loading && filtered.length === 0 && (
-          <div className="text-center py-12 text-gray-500">No items match your filters</div>
+          <div className="text-center py-16">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-800">
+              <FiShoppingBag className="text-gray-500" size={28} />
+            </div>
+            <p className="text-lg font-semibold text-white">No items match your filters</p>
+            <p className="text-gray-500 mt-1">Try adjusting your search or be the first to list!</p>
+          </div>
         )}
       </div>
     </AppLayout>

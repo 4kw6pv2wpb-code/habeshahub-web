@@ -2,13 +2,27 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FiSearch, FiMapPin, FiHome, FiPlus, FiUser, FiLoader } from 'react-icons/fi';
+import { FiSearch, FiMapPin, FiHome, FiPlus, FiUser, FiGrid } from 'react-icons/fi';
 import AppLayout from '@/components/layout/AppLayout';
 import { housingApi } from '@/lib/api';
 import { useAnalytics } from '@/lib/useAnalytics';
 
 const CITIES = ['All Cities', 'Seattle, WA', 'Washington, DC', 'Los Angeles, CA', 'Atlanta, GA', 'Minneapolis, MN', 'Columbus, OH'];
 const TYPES = ['All Types', 'Apartment', 'Room', 'House', 'Sublet'];
+
+const TYPE_GRADIENTS = {
+  Apartment: 'from-blue-500/80 to-indigo-600/80',
+  Room: 'from-violet-500/80 to-purple-600/80',
+  House: 'from-emerald-500/80 to-green-600/80',
+  Sublet: 'from-amber-500/80 to-orange-600/80',
+};
+
+const TYPE_ICONS = {
+  Apartment: '🏢',
+  Room: '🛏️',
+  House: '🏡',
+  Sublet: '📋',
+};
 
 const MOCK_LISTINGS = [
   { id: '1', title: '2BR Apartment in Rainier Beach', price: '$1,450/mo', beds: 2, type: 'Apartment', city: 'Seattle, WA', poster: 'Meron T.', posted: '2 days ago', desc: 'Spacious 2BR near Ethiopian restaurants. Laundry in building. Bus line nearby.' },
@@ -28,6 +42,23 @@ const MOCK_LISTINGS = [
   { id: '15', title: 'Room in Columbus apartment', price: '$500/mo', beds: 1, type: 'Room', city: 'Columbus, OH', poster: 'Ephrem B.', posted: '3 days ago', desc: 'Looking for Habesha roommate. Close to OSU campus. Utilities split.' },
 ];
 
+function HousingSkeleton() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <div key={i} className="rounded-xl bg-gray-900 border border-gray-800 overflow-hidden">
+          <div className="skeleton h-40 w-full rounded-none !bg-gray-800" />
+          <div className="p-4 space-y-2">
+            <div className="skeleton h-5 w-24 !bg-gray-700" />
+            <div className="skeleton h-4 w-full !bg-gray-700" />
+            <div className="skeleton h-3 w-2/3 !bg-gray-700" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function HousingPage() {
   useAnalytics();
   const [search, setSearch] = useState('');
@@ -45,7 +76,6 @@ export default function HousingPage() {
         const raw = res.data?.data ?? res.data?.listings ?? res.data;
         const data = Array.isArray(raw) ? raw : [];
         if (data.length > 0) {
-          // Normalize API data to match the shape the UI expects
           const normalized = data.map((item) => ({
             id: item.id,
             title: item.title || '',
@@ -61,7 +91,6 @@ export default function HousingPage() {
         }
       } catch (err) {
         console.error('Failed to fetch housing, using mock data:', err);
-        // Keep MOCK_LISTINGS that were set as initial state
       } finally {
         setLoading(false);
       }
@@ -83,13 +112,13 @@ export default function HousingPage() {
 
   return (
     <AppLayout>
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-6xl mx-auto px-4 py-6 page-fade-in">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">Housing</h1>
-            <p className="text-gray-400 text-sm">{listings.length} listings from the community</p>
+            <p className="text-gray-400 text-sm mt-0.5">{listings.length} listings from the community</p>
           </div>
-          <button className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl text-sm flex items-center gap-2">
+          <button className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl text-sm flex items-center gap-2 transition-colors shadow-lg shadow-amber-500/20">
             <FiPlus size={16} /> Post Listing
           </button>
         </div>
@@ -101,7 +130,7 @@ export default function HousingPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search housing..."
-            className="w-full pl-11 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"
+            className="w-full pl-11 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 transition-colors"
           />
         </div>
 
@@ -130,45 +159,65 @@ export default function HousingPage() {
           />
         </div>
 
-        {loading && (
-          <div className="flex justify-center py-12">
-            <FiLoader className="w-8 h-8 animate-spin text-amber-500" />
-          </div>
-        )}
+        {loading && <HousingSkeleton />}
 
-        {/* Listings */}
+        {/* Listings — Card grid with images */}
         {!loading && (
-          <div className="space-y-3">
-            {filtered.map((listing) => (
-              <Link
-                key={listing.id}
-                href={`/housing/${listing.id}`}
-                className="block bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors group"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <h3 className="font-semibold text-white group-hover:text-amber-400 transition-colors">{listing.title}</h3>
-                    <div className="flex items-center gap-3 text-sm text-gray-400 mt-1">
-                      <span className="flex items-center gap-1"><FiMapPin size={12} /> {listing.city || listing.location}</span>
-                      <span className="flex items-center gap-1"><FiHome size={12} /> {listing.beds === 0 ? 'Studio' : `${listing.beds}BR`}</span>
-                      <span className="px-2 py-0.5 bg-gray-800 rounded text-xs">{listing.type}</span>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((listing) => {
+              const gradient = TYPE_GRADIENTS[listing.type] || 'from-gray-500/80 to-gray-600/80';
+              const icon = TYPE_ICONS[listing.type] || '🏠';
+              return (
+                <Link
+                  key={listing.id}
+                  href={`/housing/${listing.id}`}
+                  className="group block bg-gray-900 border border-gray-800 rounded-xl overflow-hidden card-hover hover:border-gray-700 transition-all"
+                >
+                  {/* Gradient image placeholder */}
+                  <div className={`relative h-40 bg-gradient-to-br ${gradient} flex items-center justify-center`}>
+                    <span className="text-5xl opacity-40">{icon}</span>
+                    {/* Price badge */}
+                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-3 py-1 rounded-lg">
+                      <span className="text-lg font-bold text-amber-400">{typeof listing.price === 'number' ? `$${listing.price}/mo` : listing.price}</span>
+                    </div>
+                    {/* Type badge */}
+                    <div className="absolute bottom-3 left-3 flex items-center gap-2">
+                      <span className="bg-black/50 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full font-medium">
+                        {listing.type}
+                      </span>
+                      <span className="bg-black/50 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
+                        <FiHome size={10} />
+                        {listing.beds === 0 ? 'Studio' : `${listing.beds} BR`}
+                      </span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-amber-400">{typeof listing.price === 'number' ? `$${listing.price}/mo` : listing.price}</div>
+
+                  {/* Card details */}
+                  <div className="p-4">
+                    <h3 className="font-semibold text-white group-hover:text-amber-400 transition-colors line-clamp-1">{listing.title}</h3>
+                    <p className="flex items-center gap-1 text-sm text-gray-400 mt-1">
+                      <FiMapPin size={12} /> {listing.city || listing.location}
+                    </p>
+                    <p className="text-sm text-gray-500 line-clamp-2 mt-2">{listing.desc || listing.description}</p>
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mt-3 pt-3 border-t border-gray-800">
+                      <FiUser size={10} /> {listing.poster || listing.user?.name || 'Community member'}
+                      {listing.posted && <span className="text-gray-600">• {listing.posted}</span>}
+                    </div>
                   </div>
-                </div>
-                <p className="text-sm text-gray-500 line-clamp-1 mb-2">{listing.desc || listing.description}</p>
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <FiUser size={10} /> Posted by {listing.poster || listing.user?.name || 'Community member'} {listing.posted ? `• ${listing.posted}` : ''}
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
 
         {!loading && filtered.length === 0 && (
-          <div className="text-center py-12 text-gray-500">No listings match your filters</div>
+          <div className="text-center py-16">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-800">
+              <FiHome className="text-gray-500" size={28} />
+            </div>
+            <p className="text-lg font-semibold text-white">No listings match your filters</p>
+            <p className="text-gray-500 mt-1">Try adjusting your search criteria or be the first to post!</p>
+          </div>
         )}
       </div>
     </AppLayout>

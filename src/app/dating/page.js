@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { ProfileCard } from '@/components/dating/ProfileCard';
 import { MatchesList } from '@/components/dating/MatchesList';
-import { FiHeart, FiX, FiStar, FiUser, FiSettings, FiLoader } from 'react-icons/fi';
+import { FiHeart, FiX, FiStar, FiUser, FiSettings } from 'react-icons/fi';
 import { datingApi } from '@/lib/api';
 import { useAnalytics } from '@/lib/useAnalytics';
 
@@ -73,6 +73,32 @@ const DEMO_PROFILES = [
   },
 ];
 
+function DatingSkeleton() {
+  return (
+    <div className="mx-auto max-w-lg">
+      <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden dark:border-dark-700 dark:bg-dark-800">
+        <div className="skeleton h-96 w-full rounded-none" />
+        <div className="p-4 space-y-3">
+          <div className="skeleton h-5 w-1/2" />
+          <div className="skeleton h-6 w-24 rounded-full" />
+          <div className="skeleton h-3 w-full" />
+          <div className="skeleton h-3 w-3/4" />
+          <div className="flex gap-2">
+            <div className="skeleton h-6 w-16 rounded-full" />
+            <div className="skeleton h-6 w-16 rounded-full" />
+            <div className="skeleton h-6 w-16 rounded-full" />
+          </div>
+        </div>
+      </div>
+      <div className="mt-6 flex justify-center gap-5">
+        <div className="skeleton h-16 w-16 rounded-full" />
+        <div className="skeleton h-16 w-16 rounded-full" />
+        <div className="skeleton h-16 w-16 rounded-full" />
+      </div>
+    </div>
+  );
+}
+
 export default function DatingPage() {
   useAnalytics();
   const [tab, setTab] = useState('Discover');
@@ -121,7 +147,7 @@ export default function DatingPage() {
 
   return (
     <AppLayout>
-      <div className="mx-auto max-w-2xl px-4 py-6">
+      <div className="mx-auto max-w-3xl px-4 py-6 page-fade-in">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dating</h1>
           <button className="rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-dark-700">
@@ -147,40 +173,40 @@ export default function DatingPage() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <FiLoader className="animate-spin text-primary" size={28} />
-          </div>
+          <DatingSkeleton />
         ) : tab === 'Discover' ? (
           currentProfile ? (
             <div className="relative">
               <ProfileCard profile={currentProfile} />
               {/* Swipe buttons */}
-              <div className="mt-4 flex justify-center gap-4">
+              <div className="mt-6 flex justify-center gap-5">
                 <button
                   onClick={() => handleSwipe('LEFT')}
-                  className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-red-300 text-red-400 transition hover:bg-red-50 hover:text-red-500 dark:border-red-800 dark:hover:bg-red-900/20"
+                  className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-red-300 text-red-400 shadow-lg transition-all hover:bg-red-50 hover:text-red-500 hover:scale-110 active:scale-95 dark:border-red-800 dark:hover:bg-red-900/20"
                 >
-                  <FiX size={28} />
+                  <FiX size={30} />
                 </button>
                 <button
                   onClick={() => handleSwipe('SUPER')}
-                  className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-blue-300 text-blue-400 transition hover:bg-blue-50 hover:text-blue-500 dark:border-blue-800 dark:hover:bg-blue-900/20"
+                  className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-blue-300 text-blue-400 shadow-lg transition-all hover:bg-blue-50 hover:text-blue-500 hover:scale-110 active:scale-95 dark:border-blue-800 dark:hover:bg-blue-900/20"
                 >
-                  <FiStar size={24} />
+                  <FiStar size={26} />
                 </button>
                 <button
                   onClick={() => handleSwipe('RIGHT')}
-                  className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-green-300 text-green-400 transition hover:bg-green-50 hover:text-green-500 dark:border-green-800 dark:hover:bg-green-900/20"
+                  className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-green-300 text-green-400 shadow-lg transition-all hover:bg-green-50 hover:text-green-500 hover:scale-110 active:scale-95 dark:border-green-800 dark:hover:bg-green-900/20"
                 >
-                  <FiHeart size={24} />
+                  <FiHeart size={26} />
                 </button>
               </div>
               <p className="mt-3 text-center text-xs text-gray-400">{currentIdx + 1} of {profiles.length} profiles</p>
             </div>
           ) : (
             <div className="rounded-xl bg-gray-50 p-12 text-center dark:bg-dark-800">
-              <FiHeart className="mx-auto mb-3 text-primary" size={40} />
-              <p className="font-semibold text-gray-700 dark:text-gray-300">No more profiles</p>
+              <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                <FiHeart className="text-primary" size={28} />
+              </div>
+              <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">No more profiles</p>
               <p className="text-sm text-gray-500">Check back later for new people.</p>
             </div>
           )
@@ -189,8 +215,10 @@ export default function DatingPage() {
             <MatchesList matches={matches} />
           ) : (
             <div className="rounded-xl bg-gray-50 p-12 text-center dark:bg-dark-800">
-              <FiHeart className="mx-auto mb-3 text-primary" size={40} />
-              <p className="font-semibold text-gray-700 dark:text-gray-300">No matches yet</p>
+              <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                <FiHeart className="text-primary" size={28} />
+              </div>
+              <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">No matches yet</p>
               <p className="text-sm text-gray-500">Keep swiping to find your person!</p>
             </div>
           )
