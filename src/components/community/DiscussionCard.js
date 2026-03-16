@@ -16,54 +16,68 @@ const TAG_COLORS = {
 };
 
 export function DiscussionCard({ post }) {
-  const tagColor = TAG_COLORS[post.tag] || 'bg-gray-100 text-gray-600 dark:bg-dark-700 dark:text-gray-400';
+  // Map API fields to component fields
+  const tag = post.tag || 'Discussion';
+  const title = post.title || (post.content ? post.content.substring(0, 80) + (post.content.length > 80 ? '...' : '') : 'Untitled');
+  const preview = post.preview || post.content || '';
+  const replyCount = post.replyCount || post.commentsCount || 0;
+  const likeCount = post.likeCount || post.likesCount || 0;
+  const views = post.views || 0;
+  const authorName = typeof post.author === 'string' ? post.author : post.author?.name || 'User';
+  const tagColor = TAG_COLORS[tag] || 'bg-gray-100 text-gray-600 dark:bg-dark-700 dark:text-gray-400';
+
+  let timeAgo = '';
+  try {
+    timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+  } catch {
+    timeAgo = '';
+  }
 
   return (
     <div className="group rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-primary/30 hover:shadow-md dark:border-dark-700 dark:bg-dark-800 dark:hover:border-primary/30">
       {/* Tag */}
       <div className="mb-2">
         <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${tagColor}`}>
-          {post.tag}
+          {tag}
         </span>
       </div>
 
       {/* Title */}
       <Link href={`/community/${post.id}`}>
         <h3 className="mb-1 text-base font-semibold text-gray-900 group-hover:text-primary dark:text-white">
-          {post.title}
+          {title}
         </h3>
       </Link>
 
       {/* Preview text */}
       <p className="mb-3 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
-        {post.preview}
+        {preview}
       </p>
 
       {/* Author + Footer */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-            {post.author.name.charAt(0)}
+            {authorName.charAt(0)}
           </div>
           <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-            <span className="font-medium text-gray-700 dark:text-gray-300">{post.author.name}</span>
+            <span className="font-medium text-gray-700 dark:text-gray-300">{authorName}</span>
             <span>&middot;</span>
-            <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
+            <span>{timeAgo}</span>
           </div>
         </div>
-
         <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
           <span className="flex items-center gap-1">
             <FiMessageCircle size={14} />
-            {post.replyCount}
+            {replyCount}
           </span>
           <span className="flex items-center gap-1">
             <FiHeart size={14} />
-            {post.likeCount}
+            {likeCount}
           </span>
           <span className="flex items-center gap-1">
             <FiEye size={14} />
-            {post.views}
+            {views}
           </span>
         </div>
       </div>
