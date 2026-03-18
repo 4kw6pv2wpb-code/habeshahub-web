@@ -1,5 +1,12 @@
 'use client';
 
+/*
+ * Copyright (c) 2026 HabeshaHub, Inc. All rights reserved.
+ * This source code is proprietary and confidential.
+ * Unauthorized copying, modification, or distribution is strictly prohibited.
+ */
+
+
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { FiSearch, FiBriefcase, FiHome, FiCalendar, FiShoppingBag, FiUsers } from 'react-icons/fi';

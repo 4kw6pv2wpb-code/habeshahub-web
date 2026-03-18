@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 HabeshaHub, Inc. All rights reserved.
+ * This source code is proprietary and confidential.
+ * Unauthorized copying, modification, or distribution is strictly prohibited.
+ */
+
 /**
  * Convert a date string/Date to a human-readable relative time.
  * e.g. "2 hours ago", "Yesterday", "3 days ago"

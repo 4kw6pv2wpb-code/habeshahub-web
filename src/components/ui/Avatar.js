@@ -1,5 +1,12 @@
 'use client';
 
+/*
+ * Copyright (c) 2026 HabeshaHub, Inc. All rights reserved.
+ * This source code is proprietary and confidential.
+ * Unauthorized copying, modification, or distribution is strictly prohibited.
+ */
+
+
 const sizeMap = { sm: 'h-8 w-8 text-xs', md: 'h-10 w-10 text-sm', lg: 'h-12 w-12 text-base', xl: 'h-16 w-16 text-lg' };
 const iconSizeMap = { sm: 14, md: 18, lg: 22, xl: 30 };
 const colors = ['bg-primary', 'bg-accent', 'bg-habesha-green', 'bg-eritrean-blue', 'bg-habesha-red'];

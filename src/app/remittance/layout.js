@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 HabeshaHub, Inc. All rights reserved.
+ * This source code is proprietary and confidential.
+ * Unauthorized copying, modification, or distribution is strictly prohibited.
+ */
+
 export const metadata = {
   title: 'Send Money Home — Low-Fee Remittance to East Africa',
   description:

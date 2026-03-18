@@ -1,5 +1,12 @@
 'use client';
 
+/*
+ * Copyright (c) 2026 HabeshaHub, Inc. All rights reserved.
+ * This source code is proprietary and confidential.
+ * Unauthorized copying, modification, or distribution is strictly prohibited.
+ */
+
+
 import Link from 'next/link';
 import { FiArrowLeft, FiTrendingUp, FiUsers, FiDollarSign, FiGlobe, FiLayers, FiBarChart2, FiMail, FiCalendar } from 'react-icons/fi';
 import { useAnalytics } from '@/lib/useAnalytics';

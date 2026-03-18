@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 HabeshaHub, Inc. All rights reserved.
+ * This source code is proprietary and confidential.
+ * Unauthorized copying, modification, or distribution is strictly prohibited.
+ */
+
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';

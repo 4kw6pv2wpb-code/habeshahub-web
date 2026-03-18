@@ -1,5 +1,12 @@
 'use client';
 
+/*
+ * Copyright (c) 2026 HabeshaHub, Inc. All rights reserved.
+ * This source code is proprietary and confidential.
+ * Unauthorized copying, modification, or distribution is strictly prohibited.
+ */
+
+
 import Link from 'next/link';
 import { FiShoppingBag, FiMapPin, FiStar, FiMessageCircle } from 'react-icons/fi';
 

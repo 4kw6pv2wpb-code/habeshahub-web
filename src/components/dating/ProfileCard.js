@@ -1,5 +1,12 @@
 'use client';
 
+/*
+ * Copyright (c) 2026 HabeshaHub, Inc. All rights reserved.
+ * This source code is proprietary and confidential.
+ * Unauthorized copying, modification, or distribution is strictly prohibited.
+ */
+
+
 import { FiMapPin, FiUser, FiBriefcase, FiBook } from 'react-icons/fi';
 
 export function ProfileCard({ profile }) {

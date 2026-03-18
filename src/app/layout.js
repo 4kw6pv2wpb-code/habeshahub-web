@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 HabeshaHub, Inc. All rights reserved.
+ * This source code is proprietary and confidential.
+ * Unauthorized copying, modification, or distribution is strictly prohibited.
+ */
+
 import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/lib/auth-context';
 import './globals.css';
