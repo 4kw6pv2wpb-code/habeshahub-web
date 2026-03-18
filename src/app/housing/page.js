@@ -113,7 +113,7 @@ export default function HousingPage() {
   return (
     <AppLayout>
       <div className="max-w-6xl mx-auto px-4 py-6 page-fade-in">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">Housing</h1>
             <p className="text-gray-400 text-sm mt-0.5">{listings.length} listings from the community</p>
@@ -139,14 +139,14 @@ export default function HousingPage() {
           <select
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            className="px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-sm text-gray-300 focus:outline-none focus:border-amber-500"
+            className="w-full sm:w-auto px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-sm text-gray-300 focus:outline-none focus:border-amber-500"
           >
             {CITIES.map((c) => <option key={c}>{c}</option>)}
           </select>
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-sm text-gray-300 focus:outline-none focus:border-amber-500"
+            className="w-full sm:w-auto px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-sm text-gray-300 focus:outline-none focus:border-amber-500"
           >
             {TYPES.map((t) => <option key={t}>{t}</option>)}
           </select>
@@ -155,7 +155,7 @@ export default function HousingPage() {
             value={priceMax}
             onChange={(e) => setPriceMax(e.target.value)}
             placeholder="Max $/mo"
-            className="px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-sm text-gray-300 w-28 focus:outline-none focus:border-amber-500"
+            className="w-full sm:w-auto px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-sm text-gray-300 w-28 focus:outline-none focus:border-amber-500"
           />
         </div>
 

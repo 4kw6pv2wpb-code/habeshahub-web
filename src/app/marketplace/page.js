@@ -131,7 +131,7 @@ export default function MarketplacePage() {
 
         {/* Filters */}
         <div className="flex gap-4 mb-6 overflow-x-auto pb-2">
-          <div className="flex gap-2 scrollbar-hide">
+          <div className="flex gap-2 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
@@ -147,7 +147,7 @@ export default function MarketplacePage() {
         </div>
 
         {/* Price filter */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-6">
           {['All', 'Under $25', '$25-$100', '$100-$500', '$500+'].map((range) => (
             <button
               key={range}

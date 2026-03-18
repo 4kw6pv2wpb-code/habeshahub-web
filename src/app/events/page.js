@@ -79,7 +79,7 @@ export default function EventsPage() {
           />
         </div>
 
-        <div className="mb-6 flex gap-2">
+        <div className="mb-6 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button
               key={t}

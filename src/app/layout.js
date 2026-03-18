@@ -4,6 +4,13 @@ import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#0F172A',
+};
+
 export const metadata = {
   title: {
     default: 'HabeshaHub — The Diaspora Super App',
@@ -35,7 +42,6 @@ export const metadata = {
   alternates: {
     canonical: 'https://habeshahub-web-production.up.railway.app',
   },
-  themeColor: '#0F172A',
   openGraph: {
     title: 'HabeshaHub — The Diaspora Super App',
     description:

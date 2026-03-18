@@ -14,7 +14,7 @@ export function CreatePostBox({ onOpen }) {
           What&apos;s on your mind?
         </button>
       </div>
-      <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-dark-700">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-1 border-t border-gray-100 pt-3 dark:border-dark-700">
         <button className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-dark-700"><FiImage size={18} className="text-habesha-green" /> Photo</button>
         <button className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-dark-700"><FiVideo size={18} className="text-habesha-red" /> Video</button>
         <button className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-dark-700"><FiCalendar size={18} className="text-primary" /> Event</button>
